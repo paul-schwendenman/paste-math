@@ -1,5 +1,5 @@
-from framework import bottle
-from framework.bottle import route, template, request, error, debug
+from lib import bottle
+from lib.bottle import route, template, request, error, debug
 from google.appengine.ext.webapp.util import run_wsgi_app
  
 @route('/')
