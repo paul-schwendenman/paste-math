@@ -1,8 +1,3 @@
-<html>
-<head>
-<title>paste-bin</title>
-</head>
-<body>
 <p>Add a new task to the ToDo list:</p>
 <form action="/edit/{{name}}" method="POST">
 Title: <br>
@@ -17,5 +12,5 @@ URL: <br>
 
 <input type="submit" name="save" value="save">
 </form>
-</body>
-</html>
+
+%rebase templates/layout_admin

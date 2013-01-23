@@ -3,7 +3,6 @@
 <title>paste-math</title>
 </head>
 <body>
-
 <table border="1">
   <tr>
     <th>Url</th>

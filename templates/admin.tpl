@@ -1,9 +1,3 @@
-<html>
-<head>
-<title>paste-math</title>
-</head>
-<body>
-
 <table border="1">
   <tr>
     <th>Url</th>
@@ -20,6 +14,4 @@
 %end
 </table>
 
-
-</body>
-</html>
+%rebase templates/layout_admin
