@@ -52,7 +52,7 @@ def edit(name):
     p = q.get()
     title = p.title
     content = p.content
-    lib.db.d(p)
+    #lib.db.d(p)
     return template('templates/edit_page.tpl', name=name, body=content, url=name, title=title)
 
 @route('/edit/:name', method='POST')
@@ -61,6 +61,10 @@ def edit_post(name):
         title = request.POST.get('title', '').strip()
         data = request.POST.get('data', '').strip()
         url = request.POST.get('url', '').strip()
+
+        q = lib.db.Page.gql("WHERE url = :1", name)
+        p = q.get()
+        lib.db.d(p)
 
         if url == name:
             message = '<p>The ID %s was successfully updated</p><p><a href="/show/%s">Show</a></p>' % (url, url)
