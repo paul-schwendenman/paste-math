@@ -7,11 +7,10 @@
 <div id="content">
 %include
 </div>
-<div id="menu">
+<div id="fixed">
 <a href='/new'>New</a> - 
 <a href='/admin'>Admin List</a> - 
 <a href='/'>Home</a>
- 
 </div>
 
 </body>

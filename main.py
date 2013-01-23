@@ -42,7 +42,9 @@ def new_post():
         url = lib.db.getUrlString()
         lib.db.Page(title=title, content=data, url=url).put()
 
-        return '<p>The new task was inserted into the database, the ID is %s</p><p>Go back to admin: <a href="/admin">here</a></p>' % url
+        return '<p>The new task was inserted into the database, \
+            the ID is %s</p><a href="/show/%s">Show</a></p><p>Go \
+            back to admin: <a href="/admin">here</a></p>' % (url, url)
 
 @route('/edit/:name', method='GET')
 def edit(name):
@@ -61,27 +63,23 @@ def edit_post(name):
         url = request.POST.get('url', '').strip()
 
         if url == name:
-            message = '<p>The ID %s was successfully updated</p>' % url
+            message = '<p>The ID %s was successfully updated</p><p><a href="/show/%s">Show</a></p>' % (url, url)
             #lib.db.q('UPDATE Page SET url = ?, data = ? WHERE url = :1', url)
         else:
-            message =  '<p>The new task was inserted into the database, the ID is %s</p>' % url 
+            message =  '<p>The new task was inserted into the database, the ID is %s</p><a href="/show/%s">Show</a></p>' % (url, url) 
             #lib.db.Page(title=title, content=data, url=url).put()
 
         lib.db.Page(title=title, content=data, url=url).put()
 
-        return message
+        return template('templates/simple.tpl', body=message)
 
 @route('/help')
 def help():
     static_file('help.html', root='.')
 
 @route('/static/<filename>')
-def css(filename):
-    static_file(filename, root='.')
-
-@route('/help')
-def help():
-    static_file('help.html', root='.')
+def static(filename):
+    return static_file(filename, root='static')
 
 @route('/json:json#[1-9]+#')
 def show_json(json):
