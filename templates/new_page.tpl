@@ -9,5 +9,5 @@ Body: <br>
 <input type="submit" name="save" value="save">
 </form>
 
-%rebase templates/layout_admin
+%rebase templates/layout
 

@@ -1,3 +1,3 @@
 {{!body}}
 
-%rebase templates/layout_admin
+%rebase templates/layout

@@ -21,4 +21,4 @@
 %end
 </div>
 
-%rebase templates/layout_user
+%rebase templates/layout
