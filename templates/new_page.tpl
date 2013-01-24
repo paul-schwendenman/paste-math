@@ -3,7 +3,7 @@
 Title: <br>
 <input type="text" name="title"><br>
 Body: <br>
-<textarea name="data" cols="80" rows="30">
+<textarea name="data" cols="80" rows="20">
 </textarea>
 <br />
 <input type="submit" name="save" value="save">

@@ -42,9 +42,12 @@ def new_post():
         url = lib.db.getUrlString()
         lib.db.Page(title=title, content=data, url=url).put()
 
-        return '<p>The new task was inserted into the database, \
-            the ID is %s</p><a href="/show/%s">Show</a></p><p>Go \
-            back to admin: <a href="/admin">here</a></p>' % (url, url)
+        message =  '<p>The new task was inserted into the database, \
+            the ID is %s</p><p><a href="/edit/%s">Edit</a></p><p><a \
+            href="/show/%s">Show</a></p>' % (url, url, url)
+
+        return template('templates/submit.tpl', body=message, data=addLineBreaks(data), title=title)
+
 
 @route('/edit/:name', method='GET')
 def edit(name):
@@ -67,15 +70,15 @@ def edit_post(name):
         lib.db.d(p)
 
         if url == name:
-            message = '<p>The ID %s was successfully updated</p><p><a href="/show/%s">Show</a></p>' % (url, url)
+            message = '<p>The ID %s was successfully updated</p><p><a href="/edit/%s">Edit</a></p><p><a href="/show/%s">Show</a></p>' % (url, url, url)
             #lib.db.q('UPDATE Page SET url = ?, data = ? WHERE url = :1', url)
         else:
-            message =  '<p>The new task was inserted into the database, the ID is %s</p><a href="/show/%s">Show</a></p>' % (url, url) 
+            message =  '<p>The new task was inserted into the database, the ID is %s</p><p><a href="/edit/%s">Edit</a></p><p><a href="/show/%s">Show</a></p>' % (url, url, url) 
             #lib.db.Page(title=title, content=data, url=url).put()
 
         lib.db.Page(title=title, content=data, url=url).put()
 
-        return template('templates/simple.tpl', body=message)
+        return template('templates/submit.tpl', body=message, data=addLineBreaks(data), title=title)
 
 @route('/help')
 def help():
