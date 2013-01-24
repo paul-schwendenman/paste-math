@@ -34,13 +34,13 @@ Run the app locally
 
 ::
 
-	python ~/google_projects/google_appengine/dev_appserver.py myapp/
+	python ~/google_projects/google_appengine/dev_appserver.py ~/paste-math/
 
 Upload the app
 --------------
 
 ::
 
-	python ~/google_projects/google_appengine/appcfg.py update myapp/
+	python ~/google_projects/google_appengine/appcfg.py update ~/paste-math/
 
 
