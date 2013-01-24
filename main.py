@@ -3,7 +3,7 @@ from lib.bottle import route, template, request, error, debug, static_file
 from google.appengine.ext.webapp.util import run_wsgi_app
 import lib.db
 from lib.html import addLineBreaks
-
+from google.appengine.api import users
 
 @route('/')
 def index():
