@@ -13,4 +13,12 @@
 %end
 </table>
 
+<div id="fixed">
+%if users.get_current_user():
+	<a href="{{users.create_logout_url("/")}}">sign out</a>
+%else:
+	<a href="{{users.create_login_url("/")}}">sign in</a>
+%end
+</div>
+
 %rebase templates/layout_user

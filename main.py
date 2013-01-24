@@ -7,19 +7,18 @@ from google.appengine.api import users
 
 @route('/')
 def index():
-    #q = lib.db.q("SELECT url, title FROM Page")
-    q = lib.db.Page.all()
-    result = [[p.url, p.title] for p in q.run()]
-    output = template('templates/index', rows=result)
+    if not users.is_current_user_admin():
+        #q = lib.db.q("SELECT url, title FROM Page")
+        q = lib.db.Page.all()
+        result = [[p.url, p.title] for p in q.run()]
+        output = template('templates/index', rows=result, users=users)
+    else:
+        #result = lib.db.q("SELECT * FROM Page")
+        q = lib.db.Page.all()
+        result = [[p.url, p.title] for p in q.run()]
+        output = template('templates/admin', rows=result, users=users)
     return output
 
-@route('/admin')
-def admin():
-    #result = lib.db.q("SELECT * FROM Page")
-    q = lib.db.Page.all()
-    result = [[p.url, p.title] for p in q.run()]
-    output = template('templates/admin', rows=result)
-    return output
 
 @route('/show/:name')
 def show(name):
@@ -43,10 +42,10 @@ def new_post():
         lib.db.Page(title=title, content=data, url=url).put()
 
         message =  '<p>The new task was inserted into the database, \
-            the ID is %s</p><p><a href="/edit/%s">Edit</a></p><p><a \
-            href="/show/%s">Show</a></p>' % (url, url, url)
+            the ID is %s</p>' % (url)
 
-        return template('templates/submit.tpl', body=message, data=addLineBreaks(data), title=title)
+        return template('templates/submit.tpl', body=message, 
+            data=addLineBreaks(data), title=title, url=url)
 
 
 @route('/edit/:name', method='GET')
@@ -70,15 +69,16 @@ def edit_post(name):
         lib.db.d(p)
 
         if url == name:
-            message = '<p>The ID %s was successfully updated</p><p><a href="/edit/%s">Edit</a></p><p><a href="/show/%s">Show</a></p>' % (url, url, url)
+            message = '<p>The ID %s was successfully updated</p>' % (url)
             #lib.db.q('UPDATE Page SET url = ?, data = ? WHERE url = :1', url)
         else:
-            message =  '<p>The new task was inserted into the database, the ID is %s</p><p><a href="/edit/%s">Edit</a></p><p><a href="/show/%s">Show</a></p>' % (url, url, url) 
+            message =  '<p>The new task was inserted into the database, the ID is %s</p>' % (url)
             #lib.db.Page(title=title, content=data, url=url).put()
 
         lib.db.Page(title=title, content=data, url=url).put()
 
-        return template('templates/submit.tpl', body=message, data=addLineBreaks(data), title=title)
+        return template('templates/submit.tpl', body=message, 
+            data=addLineBreaks(data), title=title, url=url)
 
 @route('/help')
 def help():

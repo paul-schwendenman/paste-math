@@ -13,5 +13,8 @@
   </tr>
 %end
 </table>
-
+<div id="fixed">
+	<a href="/new">New</a>
+	<a href="{{users.create_logout_url("/")}}">sign out</a>
+</div>
 %rebase templates/layout_admin
