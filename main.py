@@ -29,6 +29,15 @@ def show(name):
     return template('templates/show_page.tpl', title=title, body=content)
     #content = convertList(lst)
 
+@route('/view/:name')
+def show(name):
+    q = lib.db.Page.gql("WHERE url = :1", name)
+    p = q.get()
+    title = p.title
+    content = addLineBreaks(p.content)
+    return template('templates/view_page.tpl', title=title, body=content)
+    #content = convertList(lst)
+
 @route('/new', method='GET')
 def new():
     return template('templates/new_page.tpl')
