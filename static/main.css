@@ -51,8 +51,18 @@ body {
     height: 100%;
 }
 
+html {
+    height: 100%;
+}
 
 #content {
+}
+
+div.buffer {
+    visibility:hidden; 
+    position:absolute; 
+    top:0; 
+    left: 0
 }
 
 h2.title {

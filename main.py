@@ -40,7 +40,7 @@ def show(name):
 
 @route('/new', method='GET')
 def new():
-    return template('templates/new_page.tpl')
+    return template('templates/new_preview.tpl')
 
 @route('/new', method='POST')
 def new_post():
@@ -64,7 +64,16 @@ def edit(name):
     title = p.title
     content = p.content
     #lib.db.d(p)
-    return template('templates/edit_page.tpl', name=name, body=content, url=name, title=title)
+    return template('templates/edit_preview.tpl', name=name, body=content, url=name, title=title, data=addLineBreaks(content))
+
+@route('/edit_old/:name', method='GET')
+def edit(name):
+    q = lib.db.Page.gql("WHERE url = :1", name)
+    p = q.get()
+    title = p.title
+    content = p.content
+    #lib.db.d(p)
+    return template('templates/edit_active.tpl', name=name, body=content, url=name, title=title)
 
 @route('/edit/:name', method='POST')
 def edit_post(name):

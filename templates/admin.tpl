@@ -18,7 +18,6 @@
 	<a href="/new">New</a>
 	<a href="{{users.create_logout_url("/")}}">sign out</a>
 </div>
-
 <p>
 <ul>
 <li><p>Edit</p>
