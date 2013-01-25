@@ -5,9 +5,9 @@ api_version: 1
 threadsafe: no
 
 handlers:
-- url: /favicon\.ico
-  static_files: favicon.ico
-  upload: static/favicon\.ico
+- url: /icon\.ico
+  static_files: static/icon.ico
+  upload: static/icon\.ico
 
 - url: /robots.txt
   static_files: static/robots.txt
