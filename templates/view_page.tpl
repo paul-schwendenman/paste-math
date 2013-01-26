@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html>
 <head>
 <title>paste-math {{title}}</title>
 <link rel="icon" href="/icon.ico" />
