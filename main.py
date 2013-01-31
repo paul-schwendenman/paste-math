@@ -15,8 +15,9 @@ def index():
     else:
         #result = lib.db.q("SELECT * FROM Page")
         q = lib.db.Page.all()
+        todo = lib.db.Todo.all()
         result = [[p.url, p.title] for p in q.run()]
-        output = template('templates/admin', rows=result, users=users)
+        output = template('templates/admin', rows=result, users=users, todo=todo)
     return output
 
 
@@ -50,11 +51,38 @@ def new_post():
         url = lib.db.getUrlString()
         lib.db.Page(title=title, content=data, url=url).put()
 
-        message =  '<p>The new task was inserted into the database, \
+        message =  '<p>The new page was inserted into the database, \
             the ID is %s</p>' % (url)
 
         return template('templates/submit.tpl', body=message, 
             data=addLineBreaks(data), title=title, url=url)
+
+@route('/todo', method='GET')
+def new():
+    body = '''
+<p>Add a new task to the ToDo list:</p>
+<form action="/todo" method="POST">
+Title: <br>
+<input type="text" name="title"><br>
+Body: <br>
+<textarea name="data" cols="80" rows="20">
+</textarea>
+<br />
+<input type="submit" name="save" value="save">
+</form>
+    '''
+    return template('templates/simple.tpl', body=body)
+
+@route('/todo', method='POST')
+def new_post():
+    if request.POST.get('save','').strip():
+        title = request.POST.get('title', '').strip()
+        data = request.POST.get('data', '').strip()
+        lib.db.Todo(title=title, content=data, open=True).put()
+
+        message =  '<p>The new task was inserted into the database</p>'
+
+        return template('templates/simple.tpl', body=message)
 
 
 @route('/edit/:name', method='GET')

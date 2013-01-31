@@ -21,6 +21,10 @@ handlers:
   script: main.py
   login: admin
 
+- url: /todo
+  script: main.py
+  login: admin
+
 - url: /edit/.*
   script: main.py
   login: admin

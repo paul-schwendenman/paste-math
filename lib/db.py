@@ -11,5 +11,10 @@ class Page(db.Model):
     title = db.StringProperty()
     content = db.TextProperty()
 
+class Todo(db.Model):
+    open = db.BooleanProperty()
+    title = db.StringProperty()
+    content = db.TextProperty()
+
 q = db.GqlQuery
 d = db.delete

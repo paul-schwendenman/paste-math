@@ -1,4 +1,4 @@
-<p>Add a new task to the ToDo list:</p>
+<p>Add a new page to the list:</p>
 <form action="/new" method="POST">
 Title: <br>
 <input type="text" name="title"><br>

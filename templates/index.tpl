@@ -2,7 +2,7 @@
   <tr>
     <th>Url</th>
     <th>Title</th>
-  </th>
+  </tr>
 %for row in rows:
   <tr>
   %for col in row:
