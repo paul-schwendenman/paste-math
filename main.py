@@ -7,6 +7,8 @@ from google.appengine.api import users
 import datetime
 
 today=datetime.datetime.today
+class Object():
+    pass
 
 @route('/')
 def index():
@@ -31,15 +33,23 @@ def show(name):
         pass
     q = lib.db.Page.gql("WHERE url = :1", name)
     p = q.get()
+    if not p:
+        p = Object()
+        p.title = "Unknown Page"
+        p.content = "This page does not exist."
     title = p.title
     content = addLineBreaks(p.content)
     return template('templates/show_page.tpl', title=title, body=content)
     #content = convertList(lst)
 
 @route('/view/:name')
-def show(name):
+def view(name):
     q = lib.db.Page.gql("WHERE url = :1", name)
     p = q.get()
+    if not p:
+        p = Object()
+        p.title = "Unknown Page"
+        p.content = "This page does not exist."
     title = p.title
     content = addLineBreaks(p.content)
     return template('templates/view_page.tpl', title=title, body=content)
@@ -106,6 +116,10 @@ def new_post():
 def edit(name):
     q = lib.db.Page.gql("WHERE url = :1", name)
     p = q.get()
+    if not p:
+        p = Object()
+        p.title = ""
+        p.content = ""
     title = p.title
     content = p.content
     #lib.db.d(p)
