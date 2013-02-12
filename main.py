@@ -199,16 +199,19 @@ def show_json(json):
         return {'Task': result[0]}
  
 def main():
-    debug(True)
+    #Find a way to check if dev server.
+    #debug(True)
     run_wsgi_app(bottle.default_app())
  
 @error(403)
 def Error403(code):
-    return 'Get your codes right dude, you caused some error!'
+    message = 'Get your codes right dude, you caused some error!'
+    return template('templates/simple.tpl', body=message)
  
 @error(404)
 def Error404(code):
-    return 'Stop cowboy, what are you trying to find?'
+    message = 'Stop cowboy, what are you trying to find?'
+    return template('templates/simple.tpl', body=message)
  
 if __name__=="__main__":
     main()
