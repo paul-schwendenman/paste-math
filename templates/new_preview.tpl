@@ -28,7 +28,8 @@ Body: <br>
 <br/><br/>
 <button type="button" onclick="Preview.Update()">preview</button>
 
-<input type="submit" name="save" value="save">
+<input type="submit" name="save" value="save" alt="Save as draft"/>
+<input type="submit" name="publish" value="publish" alt="Publish"/>
 </form>
 <br/><br/>
 Preview:

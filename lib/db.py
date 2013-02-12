@@ -1,5 +1,6 @@
 from google.appengine.ext import db
 import random
+import datetime
 abc = "abcdefghijklmnopqrstuvwxyz"
 
 def getUrlString():
@@ -9,6 +10,9 @@ def getUrlString():
 class Page(db.Model):
     url = db.StringProperty()
     title = db.StringProperty()
+    grade = db.IntegerProperty()
+    published = db.BooleanProperty()
+    timestamp = db.DateTimeProperty()
     content = db.TextProperty()
 
 class Todo(db.Model):

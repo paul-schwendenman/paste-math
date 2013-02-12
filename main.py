@@ -4,25 +4,31 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 import lib.db
 from lib.html import addLineBreaks
 from google.appengine.api import users
+import datetime
+
+today=datetime.datetime.today
 
 @route('/')
 def index():
     if not users.is_current_user_admin():
-        #q = lib.db.q("SELECT url, title FROM Page")
-        q = lib.db.Page.all()
+        q = lib.db.q("SELECT * FROM Page WHERE published = True ORDER BY timestamp DESC")
+        #q = lib.db.Page.all()
         result = [[p.url, p.title] for p in q.run()]
         output = template('templates/index', rows=result, users=users)
     else:
         #result = lib.db.q("SELECT * FROM Page")
         q = lib.db.Page.all()
+        q.order('-timestamp')
         todo = lib.db.Todo.all()
-        result = [[p.url, p.title] for p in q.run()]
+        result = [[p.url, p.title, p.published] for p in q.run()]
         output = template('templates/admin', rows=result, users=users, todo=todo)
     return output
 
 
 @route('/show/:name')
 def show(name):
+    if not users.is_current_user_admin():
+        pass
     q = lib.db.Page.gql("WHERE url = :1", name)
     p = q.get()
     title = p.title
@@ -49,7 +55,18 @@ def new_post():
         title = request.POST.get('title', '').strip()
         data = request.POST.get('data', '').strip()
         url = lib.db.getUrlString()
-        lib.db.Page(title=title, content=data, url=url).put()
+        lib.db.Page(title=title, content=data, url=url, published=False, timestamp=today()).put()
+
+        message =  '<p>The new page was inserted into the database, \
+            the ID is %s</p>' % (url)
+
+        return template('templates/submit.tpl', body=message, 
+            data=addLineBreaks(data), title=title, url=url)
+    elif request.POST.get('publish','').strip():
+        title = request.POST.get('title', '').strip()
+        data = request.POST.get('data', '').strip()
+        url = lib.db.getUrlString()
+        lib.db.Page(title=title, content=data, url=url, published=True, timestamp=today()).put()
 
         message =  '<p>The new page was inserted into the database, \
             the ID is %s</p>' % (url)
@@ -94,14 +111,13 @@ def edit(name):
     #lib.db.d(p)
     return template('templates/edit_preview.tpl', name=name, body=content, url=name, title=title, data=addLineBreaks(content))
 
-@route('/edit_old/:name', method='GET')
-def edit(name):
-    q = lib.db.Page.gql("WHERE url = :1", name)
-    p = q.get()
-    title = p.title
-    content = p.content
-    #lib.db.d(p)
-    return template('templates/edit_active.tpl', name=name, body=content, url=name, title=title)
+#@route('/edit_old/:name', method='GET')
+#def edit(name):
+#    q = lib.db.Page.gql("WHERE url = :1", name)
+#    p = q.get()
+#    title = p.title
+#    content = p.content
+#    return template('templates/edit_active.tpl', name=name, body=content, url=name, title=title)
 
 @route('/edit/:name', method='POST')
 def edit_post(name):
@@ -121,7 +137,27 @@ def edit_post(name):
             message =  '<p>The new task was inserted into the database, the ID is %s</p>' % (url)
             #lib.db.Page(title=title, content=data, url=url).put()
 
-        lib.db.Page(title=title, content=data, url=url).put()
+        lib.db.Page(title=title, content=data, url=url, published=False, timestamp=today()).put()
+
+        return template('templates/submit.tpl', body=message, 
+            data=addLineBreaks(data), title=title, url=url)
+    elif request.POST.get('publish','').strip():
+        title = request.POST.get('title', '').strip()
+        data = request.POST.get('data', '').strip()
+        url = request.POST.get('url', '').strip()
+
+        q = lib.db.Page.gql("WHERE url = :1", name)
+        p = q.get()
+        lib.db.d(p)
+
+        if url == name:
+            message = '<p>The ID %s was successfully updated</p>' % (url)
+            #lib.db.q('UPDATE Page SET url = ?, data = ? WHERE url = :1', url)
+        else:
+            message =  '<p>The new task was inserted into the database, the ID is %s</p>' % (url)
+            #lib.db.Page(title=title, content=data, url=url).put()
+
+        lib.db.Page(title=title, content=data, url=url, published=True, timestamp=today()).put()
 
         return template('templates/submit.tpl', body=message, 
             data=addLineBreaks(data), title=title, url=url)

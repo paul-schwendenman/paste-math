@@ -3,6 +3,8 @@
   <tr>
     <th>Url</th>
     <th>Title</th>
+    <th>Published</th>
+    <th colspan="3"></th>
   </th>
 %for row in rows:
   <tr>
