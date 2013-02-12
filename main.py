@@ -1,6 +1,7 @@
 from lib import bottle
 from lib.bottle import route, template, request, error, debug, static_file
 from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.api.app_identity import get_default_version_hostname
 import lib.db
 from lib.html import addLineBreaks
 from google.appengine.api import users
@@ -200,7 +201,16 @@ def show_json(json):
  
 def main():
     #Find a way to check if dev server.
-    #debug(True)
+    if get_default_version_hostname() == 'localhost:8080':
+        debug(True)
+    else:
+        @error(500)
+        def Error500(code):
+            message = 'Internal Server Error'
+            return template('templates/simple.tpl', body=message)
+         
+
+    
     run_wsgi_app(bottle.default_app())
  
 @error(403)
