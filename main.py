@@ -6,6 +6,7 @@ import lib.db
 from lib.html import addLineBreaks
 from google.appengine.api import users
 import datetime
+import logging
 
 today=datetime.datetime.today
 class Object():
@@ -206,6 +207,7 @@ def main():
     else:
         @error(500)
         def Error500(code):
+            logging.error('There was an internal server error')
             message = 'Internal Server Error'
             return template('templates/simple.tpl', body=message)
          
@@ -215,11 +217,13 @@ def main():
  
 @error(403)
 def Error403(code):
+    logging.warning('There was a 403')
     message = 'Get your codes right dude, you caused some error!'
     return template('templates/simple.tpl', body=message)
  
 @error(404)
 def Error404(code):
+    logging.warning('There was a 404')
     message = 'Stop cowboy, what are you trying to find?'
     return template('templates/simple.tpl', body=message)
  
