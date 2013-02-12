@@ -19,7 +19,7 @@ Download and unzip::
     cd ~
     mkdir google_projects
     cd google_projects
-    wget -O gae.zip http://googleappengine.googlecode.com/files/google_appengine_1.7.1.zip
+    wget -O gae.zip http://googleappengine.googlecode.com/files/google_appengine_1.7.4.zip
     unzip gae.zip
     rm gae.zip
 
@@ -44,3 +44,21 @@ Upload the app
 	python ~/google_projects/google_appengine/appcfg.py update ~/paste-math/
 
 
+Update the GAE SDK
+-------------------
+
+Check the version from https://developers.google.com/appengine/downloads. Then update using::
+
+	cd ~/google_projects
+	rm -r google_appengine
+	wget -O gae.zip http://googleappengine.googlecode.com/files/google_appengine_1.X.X.zip
+	unzip gae.zip
+	rm !$
+
+Checking the checksum
+----------------------
+
+From https://developers.google.com/appengine/downloads google provides a sha1sum. Match it using::
+
+	sha1sum gae.zip
+	
