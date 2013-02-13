@@ -15,9 +15,3 @@ indexes:
   - name: published
   - name: timestamp
     direction: desc
-
-- kind: Page
-  properties:
-  - name: url
-  - name: content
-  - name: title
