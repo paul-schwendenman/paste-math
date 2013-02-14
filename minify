@@ -7,6 +7,6 @@ cd static
 #fi
 
 for i in *.js; do 
-	echo -e "$i...\c"; 
-	python ../minify-js.py $i
+	#echo -e "$i...\c"; 
+	../minify-js.py 1 $i
 done
