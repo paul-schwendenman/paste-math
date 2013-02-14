@@ -2,12 +2,11 @@
 
 cd static
 
-if [ -f *.min.js ]; then
-	rm *.min.js
-fi
+#if [ -f *.min.js ]; then
+#	rm *.min.js
+#fi
 
 for i in *.js; do 
 	echo -e "$i...\c"; 
 	python ../minify-js.py $i
-	echo done; 
 done

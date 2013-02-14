@@ -4,34 +4,64 @@ import httplib, urllib, sys
 
 # Define the parameters for the POST request and encode them in
 # a URL-safe format.
-f = open(sys.argv[1], 'r')
 
-filename = sys.argv[1].split('.')
-assert filename[1] == "js"
+def read(filename):
+    with open(sys.argv[1], 'r') as f:
+        output = f.read()
+    return output
 
-lines = f.read()
-
-f.close()
-filename = filename[0] + '.min.js'
-
-params = urllib.urlencode([
-    ('js_code', lines),
-    ('compilation_level', 'SIMPLE_OPTIMIZATIONS'),
-    ('output_format', 'text'),
-    ('output_info', 'compiled_code'),
-  ])
-# 'WHITESPACE_ONLY'
+def write(filename, input):
+    with open(filename, 'w') as f:
+        f.write(input)
 
 
-# Always use the following value for the Content-type header.
-headers = { "Content-type": "application/x-www-form-urlencoded" }
-conn = httplib.HTTPConnection('closure-compiler.appspot.com')
-conn.request('POST', '/compile', params, headers)
-response = conn.getresponse()
+def sendrecieve(input):
+    params = urllib.urlencode([
+        ('js_code', input),
+        ('compilation_level', 'SIMPLE_OPTIMIZATIONS'),
+        ('output_format', 'text'),
+        ('output_info', 'compiled_code'),
+      ])
+    # 'WHITESPACE_ONLY'
 
-f = open(filename, 'w')
-data = response.read()
-f.write(data)
-f.close()
+    # Always use the following value for the Content-type header.
+    headers = { "Content-type": "application/x-www-form-urlencoded" }
+    conn = httplib.HTTPConnection('closure-compiler.appspot.com')
+    conn.request('POST', '/compile', params, headers)
+    response = conn.getresponse()
+    data = response.read()
+    conn.close()
+    return data
 
-conn.close()
+
+if __name__ == '__main__':
+    filename = sys.argv[1].split('.')
+    if filename[-1] == 'js' and len(filename) == 2:
+        try:
+            try:
+                content = read(sys.argv[1])
+            except:
+                print "read error"
+                raise Exception()
+            try:
+                data = sendrecieve(content)
+            except Exception as e:
+                print "connection error"
+                raise Exception()
+            try:    
+                write(filename[0] + '.min.js', data)
+            except Exception as e:
+                print "write error"
+                print e
+                raise Exception()
+        except:
+            pass
+        else:
+            print "done"
+        finally:
+            pass
+    else:
+        print "skipped"
+
+
+
