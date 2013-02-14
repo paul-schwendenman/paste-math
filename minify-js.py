@@ -10,15 +10,18 @@ filename = sys.argv[1].split('.')
 assert filename[1] == "js"
 
 lines = f.read()
+
 f.close()
 filename = filename[0] + '.min.js'
 
 params = urllib.urlencode([
-    ('js_code', sys.argv[1]),
-    ('compilation_level', 'WHITESPACE_ONLY'),
+    ('js_code', lines),
+    ('compilation_level', 'SIMPLE_OPTIMIZATIONS'),
     ('output_format', 'text'),
     ('output_info', 'compiled_code'),
   ])
+# 'WHITESPACE_ONLY'
+
 
 # Always use the following value for the Content-type header.
 headers = { "Content-type": "application/x-www-form-urlencoded" }
@@ -31,5 +34,4 @@ data = response.read()
 f.write(data)
 f.close()
 
-#print data
 conn.close()

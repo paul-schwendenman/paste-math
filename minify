@@ -2,7 +2,7 @@
 
 cd static
 
-if [ -f *,min.js ]; then
+if [ -f *.min.js ]; then
 	rm *.min.js
 fi
 
