@@ -30,6 +30,7 @@ Body: <br>
 
 <input type="submit" name="save" value="save" alt="Save as draft"/>
 <input type="submit" name="publish" value="publish" alt="Publish"/>
+<button type="button" onclick="discardPage()">discard</button>
 </form>
 <br/><br/>
 Preview:
