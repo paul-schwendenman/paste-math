@@ -1,6 +1,6 @@
 #!/usr/bin/python2.7
 
-import httplib, urllib, sys
+import httplib, urllib, sys, os.path
 
 # Define the parameters for the POST request and encode them in
 # a URL-safe format.
@@ -34,39 +34,45 @@ def sendrecieve(input, num):
     return data
 
 def newer(filename):
-    return 0
+    try:
+        return os.path.getmtime(filename + '.min.js') > \
+               os.path.getmtime(filename + '.js') 
+    except:
+        return 0
 
-def main(filename, num):
+def main(filename, num, force=0):
     print "%s..." % filename,
     sys.stdout.flush()
     filenameparts = filename.split('.')
-    if filenameparts[-1] == 'js' and len(filenameparts) == 2 and \
-       not newer(filenameparts[0]):
-        try:
-            try:
-                content = read(filename)
-            except Exception as e:
-                print "read error"
-                #print e
-                raise Exception()
-            try:
-                data = sendrecieve(content, num)
-            except Exception as e:
-                print "connection error"
-                #print e
-                raise Exception()
-            try:    
-                write(filenameparts[0] + '.min.js', data)
-            except Exception as e:
-                print "write error"
-                #print e
-                raise Exception()
-        except:
-            pass
+    if filenameparts[-1] == 'js' and len(filenameparts) == 2:
+        if newer(filenameparts[0]) and not force:
+            print "up to date"
         else:
-            print "done"
-        finally:
-            pass
+            try:
+                try:
+                    content = read(filename)
+                except Exception as e:
+                    print "read error"
+                    #print e
+                    raise Exception()
+                try:
+                    data = sendrecieve(content, num)
+                except Exception as e:
+                    print "connection error"
+                    #print e
+                    raise Exception()
+                try:    
+                    write(filenameparts[0] + '.min.js', data)
+                except Exception as e:
+                    print "write error"
+                    #print e
+                    raise Exception()
+            except:
+                pass
+            else:
+                print "done"
+            finally:
+                pass
     else:
         print "skipped"
 
