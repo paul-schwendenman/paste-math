@@ -61,7 +61,7 @@ def main(filename, num, force=0, verbose=0):
     filenameparts = filename.split('.')
     if filenameparts[-1] == 'js' and len(filenameparts) == 2:
         if newer(filenameparts[0]) and not force:
-            print "up to date"
+            print "up-to-date"
         else:
             if verbose:
                 print 
