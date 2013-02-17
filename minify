@@ -33,11 +33,15 @@ def sendrecieve(input, num):
     conn.close()
     return data
 
+def newer(filename):
+    return 0
+
 def main(filename, num):
     print "%s..." % filename,
     sys.stdout.flush()
     filenameparts = filename.split('.')
-    if filenameparts[-1] == 'js' and len(filenameparts) == 2:
+    if filenameparts[-1] == 'js' and len(filenameparts) == 2 and \
+       not newer(filenameparts[0]):
         try:
             try:
                 content = read(filename)
