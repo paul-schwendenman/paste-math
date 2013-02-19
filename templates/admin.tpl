@@ -1,4 +1,6 @@
 <h1>Pages</h1>
+
+%if len(rows)>0:
 <table border="1">
   <tr>
     <th>Url</th>
@@ -17,6 +19,9 @@
   </tr>
 %end
 </table>
+%else:
+<p>No pages currently exist</p>
+%end
 <div id="fixed">
 	<a href="/new">New</a>
 	<a href="{{users.create_logout_url("/")}}">sign out</a>

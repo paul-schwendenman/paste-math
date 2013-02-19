@@ -1,3 +1,4 @@
+%if len(rows)>0:
 <table border="1">
   <tr>
     <th>Url</th>
@@ -12,6 +13,7 @@
   </tr>
 %end
 </table>
+%end
 
 <div id="fixed">
 %if users.get_current_user():
