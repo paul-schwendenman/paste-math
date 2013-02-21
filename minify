@@ -5,6 +5,16 @@ import httplib, urllib, sys, os.path
 # Define the parameters for the POST request and encode them in
 # a URL-safe format.
 
+
+class MinifyException(Exception):
+    def __init__(self, message=None):
+        self.message = message
+        super(MinifyException, self).__init__(self.message)
+
+    def __repr__(self):
+        return self.message
+
+
 def read(filename):
     with open(filename, 'r') as f:
         output = f.read()
@@ -15,11 +25,11 @@ def write(filename, input):
         f.write(input)
 
 def sendrecieve(input, num):
-    complier_level = ['WHITESPACE_ONLY', 'SIMPLE_OPTIMIZATIONS', 
+    compiler_level = ['WHITESPACE_ONLY', 'SIMPLE_OPTIMIZATIONS', 
         'ADVANCED_OPTIMIZATIONS']
     params = urllib.urlencode([
         ('js_code', input),
-        ('compilation_level', complier_level[num]),
+        ('compilation_level', compiler_level[num]),
         ('output_format', 'text'),
         ('output_info', 'compiled_code'),
       ])
@@ -59,22 +69,22 @@ def main(filename, num, force=0, verbose=0):
     print "%s..." % filename,
     sys.stdout.flush()
     filenameparts = filename.split('.')
-    if filenameparts[-1] == 'js' and len(filenameparts) == 2:
+    if filenameparts[-1] == 'js':
         if newer(filenameparts[0]) and not force:
             print "up-to-date"
         else:
             if verbose:
-                print 
+                print
             try:
                 try:
                     if verbose:
                         print "\treading file...",
                     content = read(filename)
-                except Exception as e:
+                except IOError as e:
                     print "read error"
                     if verbose:
                         print e
-                    raise Exception()
+                    raise
                 else:
                     if verbose:
                         print "done"
@@ -82,33 +92,31 @@ def main(filename, num, force=0, verbose=0):
                     if verbose:
                         print "\tprocessing file...",
                     data = sendrecieve(content, num)
-                except Exception as e:
+                except (IOError, ValueError, UnicodeError, TypeError) as e:
                     print "connection error"
                     if verbose:
                         print e
-                    raise Exception()
+                    raise
                 else:
                     if verbose:
                         print "done"
-                try:    
+                try:
                     if verbose:
                         print "\twriting output file...",
-                    write(filenameparts[0] + '.min.js', data)
-                except Exception as e:
+                    write('.'.join(filenameparts[:-1]) + '.min.js', data)
+                except IOError as e:
                     print "write error"
                     if verbose:
                         print e
-                    raise Exception()
+                    raise
                 else:
                     if verbose:
                         print "done"
-            except:
+            except (IOError, ValueError, UnicodeError, TypeError):
                 if verbose:
                     print "failed"
             else:
                 print "done"
-            finally:
-                pass
     elif filenameparts[-1] != 'js':
         print "not javascript file"
     else:
@@ -118,19 +126,19 @@ if __name__ == '__main__':
     COMPILER_LEVEL = 1 #Default is 1
     FORCE = False #Default is False
     VERBOSE = False
-    
+
     args = sys.argv[1:]
-    
+
     try:
         for n, arg in enumerate(sys.argv):
             if arg == '-c' or arg == '--compiler-level':
                 try:
                     value = int(sys.argv[n+1])
-                except Exception as e:
-                    raise Exception('No compilation number')
+                except ValueError:
+                    raise MinifyException('No compilation number')
                 args.remove(sys.argv[n+1])
-                if value not in [0, 1, 2]:
-                    raise Exception("Invalid compilation number")
+                if value not in (0, 1, 2):
+                    raise MinifyException("Invalid compilation number")
                 COMPILER_LEVEL = value
                 args.remove(arg)
             elif arg == '-f' or arg == '--force':
@@ -141,23 +149,13 @@ if __name__ == '__main__':
                 args.remove(arg)
             elif arg == '-h' or arg == '--help':
                 args = []
-            elif arg[0] == '-':
-                args.remove(arg)
-                if 'v' in arg:
-                    VERBOSE = True
-                    if 'f' in arg:
-                        FORCE = True
-                elif 'f' in arg:
-                    FORCE = True
-                else:
-                    raise Exception('Invalid flag')
 
         for filename in args:
             main(filename, COMPILER_LEVEL, FORCE, VERBOSE)
 
         if len(args) == 0:
             manpage()
-    except Exception as e:
+    except MinifyException as e:
         if VERBOSE:
             print e
         manpage()
