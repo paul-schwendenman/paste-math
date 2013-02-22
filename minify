@@ -1,6 +1,10 @@
 #!/usr/bin/python2.7
 
-import httplib, urllib, sys, os.path
+import httplib
+import urllib
+import sys
+import os.path
+
 
 class MinifyException(Exception):
     def __init__(self, message=None):
@@ -28,15 +32,15 @@ class Filename():
     def isJs(self):
         '''Return true if file has js extension'''
         return self._extension == 'js'
-        
+
     def isMinifiable(self):
         ''' As a convention this program will ignore all files of the format
         "name.<string>.js." This serves two purposes.  One, we ignore
         already minified js files (i.e name.min.js).  And two, we allow for
         the creation of file named, for example name.max.js, that should not
-        be minified.''' 
+        be minified.'''
         return self.isJs() and (self._nparts == 2)
-        
+
     def isUpToDate(self):
         '''Check timestamps to see if output file is 'newer' than the input'''
         try:
@@ -48,12 +52,13 @@ class Filename():
     def getOriginal(self):
         '''Return the original filename'''
         return self._oldname
-        
+
     def getNewName(self):
         '''Make the new filename and 'cache' the result'''
         if not self._new:
             self._new = os.path.join(self._path, self._name + '.min.js')
-        return self._new            
+        return self._new
+
 
 def read(filename):
     '''
@@ -63,6 +68,7 @@ def read(filename):
         output = f.read()
     return output
 
+
 def write(filename, input):
     '''
     Write input to the file
@@ -70,12 +76,13 @@ def write(filename, input):
     with open(filename, 'w') as f:
         f.write(input)
 
+
 def sendreceive(input, num):
     '''
     This function should send the javascript file to the API and
     return the result
     '''
-    compiler_level = ['WHITESPACE_ONLY', 'SIMPLE_OPTIMIZATIONS', 
+    compiler_level = ['WHITESPACE_ONLY', 'SIMPLE_OPTIMIZATIONS',
         'ADVANCED_OPTIMIZATIONS']
     params = urllib.urlencode([
         ('js_code', input),
@@ -84,13 +91,14 @@ def sendreceive(input, num):
         ('output_info', 'compiled_code'),
       ])
 
-    headers = { "Content-type": "application/x-www-form-urlencoded" }
+    headers = {"Content-type": "application/x-www-form-urlencoded"}
     conn = httplib.HTTPConnection('closure-compiler.appspot.com')
     conn.request('POST', '/compile', params, headers)
     response = conn.getresponse()
     data = response.read()
     conn.close()
     return data
+
 
 def manpage():
     print "usage: minify [-c COMPILER_LEVEL] [-f] file [file ...]"
@@ -109,9 +117,10 @@ def manpage():
     print "\tminify -vf ../that.js"
     print "\tminify static/*"
 
+
 def main(filename, num, force=0, verbose=0):
     file = Filename(filename)
-    
+
     print "%s..." % filename,
     sys.stdout.flush()
     if file.isMinifiable():
@@ -179,10 +188,10 @@ if __name__ == '__main__':
         for n, arg in enumerate(sys.argv):
             if arg == '-c' or arg == '--compiler-level':
                 try:
-                    value = int(sys.argv[n+1])
+                    value = int(sys.argv[n + 1])
                 except ValueError:
                     raise MinifyException('No compilation number')
-                args.remove(sys.argv[n+1])
+                args.remove(sys.argv[n + 1])
                 if value not in (0, 1, 2):
                     raise MinifyException("Invalid compilation number")
                 COMPILER_LEVEL = value
@@ -198,13 +207,13 @@ if __name__ == '__main__':
             elif arg[0] == '-':
                 args.remove(arg)
                 for char in arg[1:]:
-		    if 'v' == char:
-		        VERBOSE = True
+                    if 'v' == char:
+                        VERBOSE = True
                     elif 'f' == char:
                         FORCE = True
                     else:
                         raise MinifyException('Invalid flag')
-                    
+
         for filename in args:
             main(filename, COMPILER_LEVEL, FORCE, VERBOSE)
 
