@@ -2,10 +2,6 @@
 
 import httplib, urllib, sys, os.path
 
-# Define the parameters for the POST request and encode them in
-# a URL-safe format.
-
-
 class MinifyException(Exception):
     def __init__(self, message=None):
         self.message = message
@@ -60,15 +56,25 @@ class Filename():
         return self._new            
 
 def read(filename):
+    '''
+    Read the file and return content
+    '''
     with open(filename, 'r') as f:
         output = f.read()
     return output
 
 def write(filename, input):
+    '''
+    Write input to the file
+    '''
     with open(filename, 'w') as f:
         f.write(input)
 
 def sendreceive(input, num):
+    '''
+    This function should send the javascript file to the API and
+    return the result
+    '''
     compiler_level = ['WHITESPACE_ONLY', 'SIMPLE_OPTIMIZATIONS', 
         'ADVANCED_OPTIMIZATIONS']
     params = urllib.urlencode([
@@ -78,7 +84,6 @@ def sendreceive(input, num):
         ('output_info', 'compiled_code'),
       ])
 
-    # Always use the following value for the Content-type header.
     headers = { "Content-type": "application/x-www-form-urlencoded" }
     conn = httplib.HTTPConnection('closure-compiler.appspot.com')
     conn.request('POST', '/compile', params, headers)
@@ -88,13 +93,14 @@ def sendreceive(input, num):
     return data
 
 def manpage():
-    print "usage: minify [-c COMPILER_LEVEL] [-f] file [file] ..."
+    print "usage: minify [-c COMPILER_LEVEL] [-f] file [file ...]"
     print "\t-c, --compiler-level COMPILER_LEVEL"
     print "\t\t0: Whitespace removal only"
     print "\t\t1: Simple Optimizations (default)"
     print "\t\t2: Advanced Optimizations"
     print "\t-f, --force"
-    print "\t\t Force the evaluation of all js files"
+    print "\t\t Force the evaluation of js files, i.e ignore"
+    print "\t\t the modification date"
     print "\t-v, --verbose"
     print "\t-h, --help"
     print
@@ -162,8 +168,9 @@ def main(filename, num, force=0, verbose=0):
         print "skipped"
 
 if __name__ == '__main__':
-    COMPILER_LEVEL = 1 #Default is 1
-    FORCE = False #Default is False
+    # Defaults
+    COMPILER_LEVEL = 1
+    FORCE = False
     VERBOSE = False
 
     args = sys.argv[1:]
