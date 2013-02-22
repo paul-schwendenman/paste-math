@@ -26,14 +26,14 @@ class Filename():
         if len(file_parts) > 1:
             self._extension = file_parts[-1]
         else:
-            self.extension = ''
+            self._extension = ''
         self._new = ''
 
     def isJs(self):
         '''Return true if file has js extension'''
         return self._extension == 'js'
         
-    def isMinifiable(self)
+    def isMinifiable(self):
         ''' As a convention this program will ignore all files of the format
         "name.<string>.js." This serves two purposes.  One, we ignore
         already minified js files (i.e name.min.js).  And two, we allow for
@@ -43,14 +43,14 @@ class Filename():
         
     def isUpToDate(self):
         '''Check timestamps to see if output file is 'newer' than the input'''
-        return os.path.getmtime(self._getnew()) > \
+        return os.path.getmtime(self.getNewName()) > \
                os.path.getmtime(self._oldname)
 
     def getOriginal(self):
         '''Return the original filename'''
         return self._oldname
         
-    def getNew(self):
+    def getNewName(self):
         '''Make the new filename and 'cache' the result'''
         if not self._new:
             self._new = os.path.join(self._path, self._name + '.min.js')
@@ -106,14 +106,15 @@ def manpage():
     print "\tminify -c 2 -f static/this.js"
     print "\tminify static/*"
 
-def main(file, num, force=0, verbose=0):
-    path, filename = os.path.split(file)
+def main(filename, num, force=0, verbose=0):
+    file = Filename(filename)
+    #path, filename = os.path.split(file)
     
     print "%s..." % filename,
     sys.stdout.flush()
     filenameparts = filename.split('.')
-    if filenameparts[-1] == 'js' and len(filenameparts) == 2:
-        if newer(filenameparts[0], path) and not force:
+    if file.isMinifiable():
+        if not force and file.isUpToDate():
             print "up-to-date"
         else:
             if verbose:
@@ -122,7 +123,7 @@ def main(file, num, force=0, verbose=0):
                 try:
                     if verbose:
                         print "\treading file...",
-                    content = read(filename)
+                    content = read(file.getOriginal())
                 except IOError as e:
                     print "read error"
                     if verbose:
@@ -134,7 +135,7 @@ def main(file, num, force=0, verbose=0):
                 try:
                     if verbose:
                         print "\tprocessing file...",
-                    data = sendrecieve(content, num)
+                    data = sendreceive(content, num)
                 except (IOError, ValueError, UnicodeError, TypeError) as e:
                     print "connection error"
                     if verbose:
@@ -146,8 +147,7 @@ def main(file, num, force=0, verbose=0):
                 try:
                     if verbose:
                         print "\twriting output file...",
-                    newfile = os.path.join(path, filenameparts[0] + '.min.js')
-                    write(newfile, data)
+                    write(file.getNewName(), data)
                 except IOError as e:
                     print "write error"
                     if verbose:
@@ -161,7 +161,7 @@ def main(file, num, force=0, verbose=0):
                     print "failed"
             else:
                 print "done"
-    elif filenameparts[-1] != 'js':
+    elif not file.isJs():
         print "not javascript file"
     else:
         print "skipped"
