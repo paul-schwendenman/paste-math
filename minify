@@ -14,12 +14,12 @@ def write(filename, input):
     with open(filename, 'w') as f:
         f.write(input)
 
-def sendrecieve(input, num):
-    complier_level = ['WHITESPACE_ONLY', 'SIMPLE_OPTIMIZATIONS', 
+def sendreceive(input, num):
+    compiler_level = ['WHITESPACE_ONLY', 'SIMPLE_OPTIMIZATIONS', 
         'ADVANCED_OPTIMIZATIONS']
     params = urllib.urlencode([
         ('js_code', input),
-        ('compilation_level', complier_level[num]),
+        ('compilation_level', compiler_level[num]),
         ('output_format', 'text'),
         ('output_info', 'compiled_code'),
       ])
@@ -33,10 +33,10 @@ def sendrecieve(input, num):
     conn.close()
     return data
 
-def newer(filename):
+def newer(filename, path):
     try:
-        return os.path.getmtime(filename + '.min.js') > \
-               os.path.getmtime(filename + '.js') 
+        return os.path.getmtime(os.path.join(path, filename + '.min.js')) > \
+               os.path.getmtime(os.path.join(path, filename + '.js')) 
     except:
         return 0
 
@@ -55,12 +55,14 @@ def manpage():
     print "\tminify -c 2 -f static/this.js"
     print "\tminify static/*"
 
-def main(filename, num, force=0, verbose=0):
+def main(file, num, force=0, verbose=0):
+    path, filename = os.path.split(file)
+    
     print "%s..." % filename,
     sys.stdout.flush()
     filenameparts = filename.split('.')
     if filenameparts[-1] == 'js' and len(filenameparts) == 2:
-        if newer(filenameparts[0]) and not force:
+        if newer(filenameparts[0], path) and not force:
             print "up-to-date"
         else:
             if verbose:
@@ -69,7 +71,7 @@ def main(filename, num, force=0, verbose=0):
                 try:
                     if verbose:
                         print "\treading file...",
-                    content = read(filename)
+                    content = read(file)
                 except Exception as e:
                     print "read error"
                     if verbose:
@@ -81,7 +83,7 @@ def main(filename, num, force=0, verbose=0):
                 try:
                     if verbose:
                         print "\tprocessing file...",
-                    data = sendrecieve(content, num)
+                    data = sendreceive(content, num)
                 except Exception as e:
                     print "connection error"
                     if verbose:
@@ -93,7 +95,8 @@ def main(filename, num, force=0, verbose=0):
                 try:    
                     if verbose:
                         print "\twriting output file...",
-                    write(filenameparts[0] + '.min.js', data)
+                    newfile = os.path.join(path, filenameparts[0] + '.min.js')
+                    write(newfile, data)
                 except Exception as e:
                     print "write error"
                     if verbose:
