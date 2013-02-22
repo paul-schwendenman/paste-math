@@ -43,8 +43,11 @@ class Filename():
         
     def isUpToDate(self):
         '''Check timestamps to see if output file is 'newer' than the input'''
-        return os.path.getmtime(self.getNewName()) > \
-               os.path.getmtime(self._oldname)
+        try:
+            return os.path.getmtime(self.getNewName()) > \
+                   os.path.getmtime(self._oldname)
+        except OSError:
+            return 0
 
     def getOriginal(self):
         '''Return the original filename'''
