@@ -100,6 +100,7 @@ def manpage():
     print
     print "Examples:"
     print "\tminify -c 2 -f static/this.js"
+    print "\tminify -vf ../that.js"
     print "\tminify static/*"
 
 def main(filename, num, force=0, verbose=0):
@@ -189,14 +190,14 @@ if __name__ == '__main__':
                 args = []
             elif arg[0] == '-':
                 args.remove(arg)
-                if 'v' in arg:
-                    VERBOSE = True
-                    if 'f' in arg:
+                for char in arg[1:]:
+		    if 'v' == char:
+		        VERBOSE = True
+                    elif 'f' == char:
                         FORCE = True
-                elif 'f' in arg:
-                    FORCE = True
-                else:
-                    raise Exception('Invalid flag')
+                    else:
+                        raise MinifyException('Invalid flag')
+                    
         for filename in args:
             main(filename, COMPILER_LEVEL, FORCE, VERBOSE)
 
