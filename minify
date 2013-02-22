@@ -15,6 +15,28 @@ class MinifyException(Exception):
         return self.message
 
 
+class Filename():
+    def __init__(self, filename):
+        path, file = os.path.split(filename)
+        self._oldname = filename
+        file_parts = file.split('.')
+        self._name = file_parts[0]
+        self._path = path
+        if len(file_parts) > 1:
+            self._extension = file_parts[-1]
+        else:
+            self.extension = ''
+
+    def isJs(self):
+        '''Return true if file has js extension'''
+        return self._extension == 'js'
+        
+    def getOriginal(self):
+        return self._oldname
+        
+    def getNew(self, regex=''):
+        return os.path.join(self._path, self._name + '.min.js')
+
 def read(filename):
     with open(filename, 'r') as f:
         output = f.read()
