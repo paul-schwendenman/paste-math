@@ -64,17 +64,30 @@ def read(filename):
     '''
     Read the file and return content
     '''
-    with open(filename, 'r') as f:
-        output = f.read()
-    return output
+    try:
+        with open(filename, 'r') as f:
+            data = f.read()
+    except IOError:
+        output = ('', 1)
+    else:
+        output = (data, 0)
+    finally:
+        return output
 
 
 def write(filename, input):
     '''
     Write input to the file
     '''
-    with open(filename, 'w') as f:
-        f.write(input)
+    try:
+        with open(filename, 'w') as f:
+            f.write(input)
+    except IOError:
+        status = 3
+    else:
+        status = 0
+    finally:
+        return status
 
 
 def sendreceive(input, num):
@@ -82,22 +95,28 @@ def sendreceive(input, num):
     This function should send the javascript file to the API and
     return the result
     '''
-    compiler_level = ['WHITESPACE_ONLY', 'SIMPLE_OPTIMIZATIONS',
-        'ADVANCED_OPTIMIZATIONS']
-    params = urllib.urlencode([
-        ('js_code', input),
-        ('compilation_level', compiler_level[num]),
-        ('output_format', 'text'),
-        ('output_info', 'compiled_code'),
-      ])
+    try:
+        compiler_level = ['WHITESPACE_ONLY', 'SIMPLE_OPTIMIZATIONS',
+            'ADVANCED_OPTIMIZATIONS']
+        params = urllib.urlencode([
+            ('js_code', input),
+            ('compilation_level', compiler_level[num]),
+            ('output_format', 'text'),
+            ('output_info', 'compiled_code'),
+          ])
 
-    headers = {"Content-type": "application/x-www-form-urlencoded"}
-    conn = httplib.HTTPConnection('closure-compiler.appspot.com')
-    conn.request('POST', '/compile', params, headers)
-    response = conn.getresponse()
-    data = response.read()
-    conn.close()
-    return data
+        headers = {"Content-type": "application/x-www-form-urlencoded"}
+        conn = httplib.HTTPConnection('closure-compiler.appspot.com')
+        conn.request('POST', '/compile', params, headers)
+        response = conn.getresponse()
+        data = response.read()
+    except (IOError, ValueError, UnicodeError, TypeError):
+        output = ('', 2)
+    else:
+        output = (data, 0)
+    finally:
+        conn.close()
+        return output
 
 
 def manpage():
@@ -126,55 +145,51 @@ def main(filename, num, force=0, verbose=0):
     if file.isMinifiable():
         if not force and file.isUpToDate():
             print "up-to-date"
+            status = -3
         else:
             if verbose:
                 print
-            try:
-                try:
-                    if verbose:
-                        print "\treading file...",
-                    content = read(file.getOriginal())
-                except IOError as e:
-                    print "read error"
-                    if verbose:
-                        print e
-                    raise
-                else:
-                    if verbose:
-                        print "done"
-                try:
-                    if verbose:
-                        print "\tprocessing file...",
-                    data = sendreceive(content, num)
-                except (IOError, ValueError, UnicodeError, TypeError) as e:
-                    print "connection error"
-                    if verbose:
-                        print e
-                    raise
-                else:
-                    if verbose:
-                        print "done"
-                try:
-                    if verbose:
-                        print "\twriting output file...",
-                    write(file.getNewName(), data)
-                except IOError as e:
-                    print "write error"
-                    if verbose:
-                        print e
-                    raise
-                else:
-                    if verbose:
-                        print "done"
-            except (IOError, ValueError, UnicodeError, TypeError):
+            # Read the input
+            if verbose:
+                print "\treading file...",
+            content, status = read(file.getOriginal())
+            if verbose and status == 1:
+                print "IO error"
+            elif verbose:
+                print "done"
+
+            # Process the input
+            if status == 0:
                 if verbose:
-                    print "failed"
-            else:
+                    print "\tprocessing file...",
+                data, status = sendreceive(content, num)
+                if verbose and status != 0:
+                    print "connection error"
+                elif verbose:
+                    print "done"
+
+            # Write the output
+            if status == 0:
+                if verbose:
+                    print "\twriting output file...",
+                status = write(file.getNewName(), data)
+                if verbose and status != 0:
+                    print "IO error"
+                elif verbose:
+                    print "done"
+
+            # Print status
+            if not verbose and status != 0:
+                print "failed"
+            elif not verbose:
                 print "done"
     elif not file.isJs():
         print "not javascript file"
+        status = -1
     else:
         print "skipped"
+        status = -2
+    return status
 
 if __name__ == '__main__':
     # Defaults
@@ -214,12 +229,20 @@ if __name__ == '__main__':
                     else:
                         raise MinifyException('Invalid flag')
 
-        for filename in args:
-            main(filename, COMPILER_LEVEL, FORCE, VERBOSE)
+        status = [main(filename, COMPILER_LEVEL, FORCE, VERBOSE)
+                  for filename in args]
 
+        if VERBOSE:
+            print "non js:", status.count(-1),
+            print "Skipped:", status.count(-2),
+            print "Up-to-date:", status.count(-3),
+            print "Failed:", status.count(1) + status.count(2) + \
+                  status.count(3),
+            print "Done:", status.count(0),
+            print "Total:", len(status)
         if len(args) == 0:
             manpage()
     except MinifyException as e:
         if VERBOSE:
-            print e
+            print "Error occured:", e
         manpage()
