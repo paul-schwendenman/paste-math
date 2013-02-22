@@ -21,21 +21,40 @@ class Filename():
         self._oldname = filename
         file_parts = file.split('.')
         self._name = file_parts[0]
+        self._nparts = len(file_parts)
         self._path = path
         if len(file_parts) > 1:
             self._extension = file_parts[-1]
         else:
             self.extension = ''
+        self._new = ''
 
     def isJs(self):
         '''Return true if file has js extension'''
         return self._extension == 'js'
         
+    def isMinifiable(self)
+        ''' As a convention this program will ignore all files of the format
+        "name.<string>.js." This serves two purposes.  One, we ignore
+        already minified js files (i.e name.min.js).  And two, we allow for
+        the creation of file named, for example name.max.js, that should not
+        be minified.''' 
+        return self.isJs() and (self._nparts == 2)
+        
+    def isUpToDate(self):
+        '''Check timestamps to see if output file is 'newer' than the input'''
+        return os.path.getmtime(self._getnew()) > \
+               os.path.getmtime(self._oldname)
+
     def getOriginal(self):
+        '''Return the original filename'''
         return self._oldname
         
-    def getNew(self, regex=''):
-        return os.path.join(self._path, self._name + '.min.js')
+    def getNew(self):
+        '''Make the new filename and 'cache' the result'''
+        if not self._new:
+            self._new = os.path.join(self._path, self._name + '.min.js')
+        return self._new            
 
 def read(filename):
     with open(filename, 'r') as f:
