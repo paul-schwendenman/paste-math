@@ -87,13 +87,6 @@ def sendreceive(input, num):
     conn.close()
     return data
 
-def newer(filename, path):
-    try:
-        return os.path.getmtime(os.path.join(path, filename + '.min.js')) > \
-               os.path.getmtime(os.path.join(path, filename + '.js')) 
-    except:
-        return 0
-
 def manpage():
     print "usage: minify [-c COMPILER_LEVEL] [-f] file [file] ..."
     print "\t-c, --compiler-level COMPILER_LEVEL"
@@ -111,11 +104,9 @@ def manpage():
 
 def main(filename, num, force=0, verbose=0):
     file = Filename(filename)
-    #path, filename = os.path.split(file)
     
     print "%s..." % filename,
     sys.stdout.flush()
-    filenameparts = filename.split('.')
     if file.isMinifiable():
         if not force and file.isUpToDate():
             print "up-to-date"
