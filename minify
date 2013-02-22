@@ -42,7 +42,7 @@ class Filename():
         return self.isJs() and (self._nparts == 2)
 
     def isUpToDate(self):
-        '''Check timestamps to see if output file is 'newer' than the input'''
+        '''Check time stamps to see if output file is 'newer' than the input'''
         try:
             return os.path.getmtime(self.getNewName()) > \
                    os.path.getmtime(self._oldname)
@@ -92,7 +92,7 @@ def write(filename, input):
 
 def sendreceive(input, num):
     '''
-    This function should send the javascript file to the API and
+    This function should send the JavaScript file to the API and
     return the result
     '''
     try:
@@ -122,7 +122,7 @@ def sendreceive(input, num):
 def manpage():
     print "usage: minify [-c COMPILER_LEVEL] [-f] file [file ...]"
     print "\t-c, --compiler-level COMPILER_LEVEL"
-    print "\t\t0: Whitespace removal only"
+    print "\t\t0: White space removal only"
     print "\t\t1: Simple Optimizations (default)"
     print "\t\t2: Advanced Optimizations"
     print "\t-f, --force"
@@ -244,5 +244,5 @@ if __name__ == '__main__':
             manpage()
     except MinifyException as e:
         if VERBOSE:
-            print "Error occured:", e
+            print "Error occurred:", e
         manpage()
