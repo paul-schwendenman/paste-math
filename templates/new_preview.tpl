@@ -25,6 +25,17 @@ Title: <br>
 Body: <br>
 <textarea name="data" id="data" cols="80" rows="20" style="margin-top:5px">
 </textarea><br>
+Grade: <br>
+<select name='grade'>
+<option value='7'>Grade 7</option>
+<option value='8' >Grade 8</option>
+<option value='9'>Grade 9</option>
+<option value='10'>Grade 10</option>
+<option value='11'>Grade 11</option>
+<option value='12'>Grade 12</option>
+<option value='None' selected='selected'>None</option>
+</select>
+
 <br/><br/>
 <button type="button" onclick="Preview.Update()">preview</button>
 

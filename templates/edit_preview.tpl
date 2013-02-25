@@ -26,6 +26,17 @@ Body: <br>
 <textarea name="data" id="data" cols="80" rows="20" style="margin-top:5px">
 {{body}}
 </textarea><br>
+Grade: <br>
+<select name='grade'>
+<option value='{{grade}}' selected='selected'>previous</option>
+<option value='7'>Grade 7</option>
+<option value='8'>Grade 8</option>
+<option value='9'>Grade 9</option>
+<option value='10'>Grade 10</option>
+<option value='11'>Grade 11</option>
+<option value='12'>Grade 12</option>
+<option value='None'>None</option>
+</select><br />
 Url: <br>
 <input type="text" name="url" value="{{url}}">
 <br/><br/>
