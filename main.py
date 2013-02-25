@@ -24,8 +24,8 @@ def index():
         q = lib.db.Page.all()
         q.order('-timestamp')
         todo = lib.db.Todo.all()
-        result = [[p.url, p.title, p.published] for p in q.run()]
-        output = template('templates/admin', rows=result, users=users, todo=todo)
+        result = [[p.url, p.title, p.published, p.grade] for p in q.run()]
+        output = template('templates/admin', rows=result, users=users, todo=todo, grade=False)
     return output
 
 
@@ -43,6 +43,22 @@ def show(name):
     content = addLineBreaks(p.content)
     return template('templates/show_page.tpl', title=title, body=content)
     #content = convertList(lst)
+
+@route('/grade/<number:int>')
+@route('/grade')
+def grade(number=None):
+    q = lib.db.q("SELECT * FROM Page WHERE grade = :1 ORDER BY timestamp DESC", number)
+    if not users.is_current_user_admin():
+        #q = lib.db.Page.all()
+        result = [[p.url, p.title] for p in q.run()]
+        output = template('templates/index', rows=result, users=users)
+    else:
+        #result = lib.db.q("SELECT * FROM Page")
+        result = [[p.url, p.title, p.published] for p in q.run()]
+        output = template('templates/admin', rows=result, users=users, todo=None, grade=True)
+    return output
+
+
 
 @route('/view/:name')
 def view(name):
@@ -67,7 +83,7 @@ def new_post():
         title = request.POST.get('title', '').strip()
         data = request.POST.get('data', '').strip()
         url = lib.db.getUrlString()
-        lib.db.Page(title=title, content=data, url=url, published=False, timestamp=today()).put()
+        lib.db.Page(title=title, grade=0, content=data, url=url, published=False, timestamp=today()).put()
 
         message =  '<p>The new page was inserted into the database, \
             the ID is %s</p>' % (url)
@@ -78,7 +94,7 @@ def new_post():
         title = request.POST.get('title', '').strip()
         data = request.POST.get('data', '').strip()
         url = lib.db.getUrlString()
-        lib.db.Page(title=title, content=data, url=url, published=True, timestamp=today()).put()
+        lib.db.Page(title=title, grade=0, content=data, url=url, published=True, timestamp=today()).put()
 
         message =  '<p>The new page was inserted into the database, \
             the ID is %s</p>' % (url)

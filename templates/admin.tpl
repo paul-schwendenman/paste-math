@@ -6,6 +6,9 @@
     <th>Url</th>
     <th>Title</th>
     <th>Published</th>
+%if not grade:
+    <th>Grade</th>
+%end
     <th colspan="3"></th>
   </th>
 %for row in rows:
@@ -23,9 +26,13 @@
 <p>No pages currently exist</p>
 %end
 <div id="fixed">
+%if grade:
+	<a href="/">Home</a>
+%end
 	<a href="/new">New</a>
 	<a href="{{users.create_logout_url("/")}}">sign out</a>
 </div>
+<!--
 <p>
 <ul>
 <li><p>Edit</p>
@@ -36,7 +43,8 @@
 <p>View the raw content of the page</p></li>
 </ul>
 </p>
-
+-->
+%if todo:
 <div id="todo">
 <h1>Todo</h1>
 <table border="1">
@@ -68,5 +76,6 @@ Body: <br>
 </form>
 
 </div>
+%end
 
 %rebase templates/layout

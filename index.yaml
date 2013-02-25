@@ -12,6 +12,12 @@ indexes:
 
 - kind: Page
   properties:
+  - name: grade
+  - name: timestamp
+    direction: desc
+
+- kind: Page
+  properties:
   - name: published
   - name: timestamp
     direction: desc
