@@ -13,6 +13,8 @@
   </tr>
 %end
 </table>
+%else:
+<p>No pages currently exist</p>
 %end
 
 <div id="fixed">
