@@ -24,6 +24,7 @@ def index():
         q = lib.db.Page.all()
         q.order('-timestamp')
         todo = lib.db.Todo.all()
+        todo.order('-timestamp')
         result = [[p.url, p.title, p.published, p.grade] for p in q.run()]
         output = template('templates/admin', rows=result, users=users, todo=todo, grade=False)
     return output
@@ -103,31 +104,23 @@ def new_post():
             data=addLineBreaks(data), title=title, url=url)
 
 @route('/todo', method='GET')
-def new():
-    body = '''
-<p>Add a new task to the ToDo list:</p>
-<form action="/todo" method="POST">
-Title: <br>
-<input type="text" name="title"><br>
-Body: <br>
-<textarea name="data" cols="80" rows="20">
-</textarea>
-<br />
-<input type="submit" name="save" value="save">
-</form>
-    '''
-    return template('templates/simple.tpl', body=body)
+def todo():
+    todo = lib.db.Todo.all()
+    todo.order('-timestamp')
+    return template('templates/todo.tpl', solo=True, todo=todo, message=None)
 
 @route('/todo', method='POST')
-def new_post():
+def todo_post():
     if request.POST.get('save','').strip():
         title = request.POST.get('title', '').strip()
         data = request.POST.get('data', '').strip()
-        lib.db.Todo(title=title, content=data, open=True).put()
+        lib.db.Todo(title=title, content=data, creator=users.User(), open=True, timestamp=today()).put()
 
-        message =  '<p>The new task was inserted into the database</p>'
+        todo = lib.db.Todo.all()
+        todo.order('-timestamp')
+        message =  '<p style="background: yellow;">The new task was inserted into the database</p>'
 
-        return template('templates/simple.tpl', body=message)
+        return template('templates/todo.tpl', solo=True, todo=todo, message=message)
 
 
 @route('/edit/:name', method='GET')

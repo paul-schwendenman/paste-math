@@ -19,6 +19,8 @@ class Todo(db.Model):
     open = db.BooleanProperty()
     title = db.StringProperty()
     content = db.TextProperty()
+    creator = db.UserProperty()
+    timestamp = db.DateTimeProperty()
 
 q = db.GqlQuery
 d = db.delete

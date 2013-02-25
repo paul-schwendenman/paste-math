@@ -91,3 +91,13 @@ div#grades h2 > a:hover {
     text-decoration: Underline;
     color: black;
 }
+
+div#todo > h1 > a {
+    text-decoration: None;
+    color: black;
+}
+
+div#todo > h1 > a:hover {
+    text-decoration: Underline;
+    color: black;
+}
