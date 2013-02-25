@@ -47,12 +47,13 @@ def show(name):
 @route('/grade/<number:int>')
 @route('/grade')
 def grade(number=None):
-    q = lib.db.q("SELECT * FROM Page WHERE grade = :1 ORDER BY timestamp DESC", number)
     if not users.is_current_user_admin():
+        q = lib.db.q("SELECT * FROM Page WHERE grade = :1 AND published = True ORDER BY timestamp DESC", number)
         #q = lib.db.Page.all()
         result = [[p.url, p.title] for p in q.run()]
         output = template('templates/index', rows=result, users=users)
     else:
+        q = lib.db.q("SELECT * FROM Page WHERE grade = :1 ORDER BY timestamp DESC", number)
         #result = lib.db.q("SELECT * FROM Page")
         result = [[p.url, p.title, p.published] for p in q.run()]
         output = template('templates/admin', rows=result, users=users, todo=None, grade=True)
@@ -79,25 +80,21 @@ def new():
 
 @route('/new', method='POST')
 def new_post():
-    if request.POST.get('save','').strip():
+    publish = request.POST.get('publish','').strip()
+    if request.POST.get('save','').strip() or publish:
         title = request.POST.get('title', '').strip()
         data = request.POST.get('data', '').strip()
+        try:
+            grade = int(request.POST.get('grade', '').strip())
+        except:
+            grade = None
         url = lib.db.getUrlString()
-        lib.db.Page(title=title, grade=0, content=data, url=url, published=False, timestamp=today()).put()
+        lib.db.Page(title=title, grade=grade, content=data, url=url, published=publish, timestamp=today()).put()
 
-        message =  '<p>The new page was inserted into the database, \
-            the ID is %s</p>' % (url)
-
-        return template('templates/submit.tpl', body=message, 
-            data=addLineBreaks(data), title=title, url=url)
-    elif request.POST.get('publish','').strip():
-        title = request.POST.get('title', '').strip()
-        data = request.POST.get('data', '').strip()
-        url = lib.db.getUrlString()
-        lib.db.Page(title=title, grade=0, content=data, url=url, published=True, timestamp=today()).put()
-
-        message =  '<p>The new page was inserted into the database, \
-            the ID is %s</p>' % (url)
+        if not publish:
+            message =  '<p>The new draft has been created.</p>' 
+        else:
+            message =  '<p>The new page was published.</p>'
 
         return template('templates/submit.tpl', body=message, 
             data=addLineBreaks(data), title=title, url=url)
@@ -138,10 +135,12 @@ def edit(name):
         p = Object()
         p.title = ""
         p.content = ""
+        p.grade = None
     title = p.title
     content = p.content
+    grade = p.grade
     #lib.db.d(p)
-    return template('templates/edit_preview.tpl', name=name, body=content, url=name, title=title, data=addLineBreaks(content))
+    return template('templates/edit_preview.tpl', name=name, body=content, url=name, title=title, grade=grade, data=addLineBreaks(content))
 
 #@route('/edit_old/:name', method='GET')
 #def edit(name):
@@ -153,7 +152,11 @@ def edit(name):
 
 @route('/edit/:name', method='POST')
 def edit_post(name):
-    if request.POST.get('save','').strip():
+    if request.POST.get('publish','').strip():
+        publish = True
+    else:
+        publish = False
+    if request.POST.get('save','').strip() or publish:
         title = request.POST.get('title', '').strip()
         data = request.POST.get('data', '').strip()
         url = request.POST.get('url', '').strip()
@@ -162,34 +165,17 @@ def edit_post(name):
         p = q.get()
         lib.db.d(p)
 
-        if url == name:
-            message = '<p>The ID %s was successfully updated</p>' % (url)
-            #lib.db.q('UPDATE Page SET url = ?, data = ? WHERE url = :1', url)
+        try:
+            grade = int(request.POST.get('grade', '').strip())
+        except:
+            grade = None
+        url = lib.db.getUrlString()
+        lib.db.Page(title=title, grade=grade, content=data, url=url, published=publish, timestamp=today()).put()
+
+        if not publish:
+            message =  '<p>The draft has been saved.</p>' 
         else:
-            message =  '<p>The new task was inserted into the database, the ID is %s</p>' % (url)
-            #lib.db.Page(title=title, content=data, url=url).put()
-
-        lib.db.Page(title=title, content=data, url=url, published=False, timestamp=today()).put()
-
-        return template('templates/submit.tpl', body=message, 
-            data=addLineBreaks(data), title=title, url=url)
-    elif request.POST.get('publish','').strip():
-        title = request.POST.get('title', '').strip()
-        data = request.POST.get('data', '').strip()
-        url = request.POST.get('url', '').strip()
-
-        q = lib.db.Page.gql("WHERE url = :1", name)
-        p = q.get()
-        lib.db.d(p)
-
-        if url == name:
-            message = '<p>The ID %s was successfully updated</p>' % (url)
-            #lib.db.q('UPDATE Page SET url = ?, data = ? WHERE url = :1', url)
-        else:
-            message =  '<p>The new task was inserted into the database, the ID is %s</p>' % (url)
-            #lib.db.Page(title=title, content=data, url=url).put()
-
-        lib.db.Page(title=title, content=data, url=url, published=True, timestamp=today()).put()
+            message =  '<p>The page was published.</p>'
 
         return template('templates/submit.tpl', body=message, 
             data=addLineBreaks(data), title=title, url=url)
