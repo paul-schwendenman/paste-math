@@ -44,15 +44,13 @@
 </ul>
 </p>
 -->
+%if not grade:
 <div id="grades">
-%for grades in ((7, 9, 11), (8, 10, 12)):
-<div>
-%for each_grade in grades:
+%for each_grade in (7, 8, 9, 10, 11, 12):
 <div id="grade{{each_grade}}">
-<h2>Grade {{each_grade}}</h2>
+<h2><a href="/grade/{{each_grade}}">Grade {{each_grade}}</a></h2>
 % grade_page = [item for item in rows if item[-1] == each_grade]
 %if len(grade_page)>0:
-<p><a href="/grade/{{each_grade}}">Go</a></p>
 <table border="1">
   <tr>
     <th>Url</th>
@@ -77,7 +75,6 @@
 %end
 </div>
 %end
-</div>
 %if todo:
 <div id="todo">
 <h1>Todo</h1>

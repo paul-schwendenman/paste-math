@@ -77,22 +77,17 @@ div.preview {
     padding: 1em;
 }
 
-div#grades {
-    overflow: hidden;
-}
-
 div#grades > div {
     width: 45%;
+    display: inline-table;
 }
 
-div#grades > div:nth-child(even) {
-    float: right;
+div#grades h2 > a {
+    text-decoration: None;
+    color: black;
 }
 
-div#grades > div:nth-child(odd) {
-    float: left;
-}
-
-div#grades :after {
-    clear:both;
+div#grades h2 > a:hover {
+    text-decoration: Underline;
+    color: black;
 }
