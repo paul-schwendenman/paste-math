@@ -83,15 +83,59 @@ Preview.callback.autoReset = true;  // make sure it can run more than once
 // Discard Button
 //
 function discardPage(){
-  if (confirm('Are you sure you want to discard the changes?')) {
+  var form = document.getElementsByName('page')[0];
+  if (form.title.value + form.data.value == '') {
     window.location='/';
   }
+  else if (confirm('Are you sure you want to discard the changes?')) {
+    window.location='/';
+  }
+}
+
+// 
+// Form Validation
+//
+function validateForm(form){
+  var reason = '';
+  
+  reason += validateTitleEmpty(form.title);
+  reason += validateContentEmpty(form.data);
+  
+  if (reason != '') {
+    alert('Some fields need correction:\n' + reason);
+    return false;
+  }
+  
+  return true;  
+}
+
+function validateTitleEmpty(item) {
+  var error = '';
+  if (item.value.length == 0) {
+    item.style.background = '#ff3333';
+    error = "Required title missing.\n";
+  } else {
+    item.style.background = '#000000';
+  }
+  return error;
+}
+
+function validateContentEmpty(item) {
+  var error = '';
+  if (item.value.length == 0) {
+    item.style.background = '#ff3333';
+    error = "Required content missing.\n";
+  } else {
+    item.style.background = '#000000';
+  }
+  return error;
 }
 
 //
 // Export symbols
 //
 
+window['validateForm']=validateForm;
 window['discardPage']=discardPage;
 window['Preview']=Preview;
 Preview['Init']=Preview.Init;

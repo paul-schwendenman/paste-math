@@ -19,7 +19,7 @@
 <body>
 <div id="body">
 <div id="content">
-<form action="/edit/{{name}}" method="POST">
+<form name="page" onsubmit="return validateForm(this)" action="/edit/{{name}}" method="POST">
 Title: <br>
 <input type="text" name="title" value="{{title}}"><br>
 Body: <br>

@@ -19,7 +19,7 @@
 <body>
 <div id="body">
 <div id="content">
-<form action="/new" method="POST">
+<form name="page" onsubmit="return validateForm(this)" action="/new" method="POST">
 Title: <br>
 <input type="text" name="title"><br>
 Body: <br>
