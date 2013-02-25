@@ -76,3 +76,23 @@ div.preview {
     border: double; 
     padding: 1em;
 }
+
+div#grades {
+    overflow: hidden;
+}
+
+div#grades > div {
+    width: 45%;
+}
+
+div#grades > div:nth-child(even) {
+    float: right;
+}
+
+div#grades > div:nth-child(odd) {
+    float: left;
+}
+
+div#grades :after {
+    clear:both;
+}

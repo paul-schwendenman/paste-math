@@ -44,6 +44,40 @@
 </ul>
 </p>
 -->
+<div id="grades">
+%for grades in ((7, 9, 11), (8, 10, 12)):
+<div>
+%for each_grade in grades:
+<div id="grade{{each_grade}}">
+<h2>Grade {{each_grade}}</h2>
+% grade_page = [item for item in rows if item[-1] == each_grade]
+%if len(grade_page)>0:
+<p><a href="/grade/{{each_grade}}">Go</a></p>
+<table border="1">
+  <tr>
+    <th>Url</th>
+    <th>Title</th>
+    <th>Published</th>
+    <th colspan="3"></th>
+  </th>
+%for row in grade_page:
+  <tr>
+  %for col in row[:-1]:
+    <td>{{col}}</td>
+  %end
+  <td><a href="edit/{{row[0]}}">edit</a></td>
+  <td><a href="show/{{row[0]}}">show</a></td>
+  </tr>
+%end
+</table>
+%else:
+<p>No pages exist</p>
+%end
+</div>
+%end
+</div>
+%end
+</div>
 %if todo:
 <div id="todo">
 <h1>Todo</h1>
