@@ -16,9 +16,9 @@
   %for col in row:
     <td>{{col}}</td>
   %end
-  <td><a href="edit/{{row[0]}}">edit</a></td>
-  <td><a href="show/{{row[0]}}">show</a></td>
-  <td><a href="view/{{row[0]}}">view</a></td>
+  <td><a href="/edit/{{row[0]}}">edit</a></td>
+  <td><a href="/show/{{row[0]}}">show</a></td>
+  <td><a href="/view/{{row[0]}}">view</a></td>
   </tr>
 %end
 </table>
@@ -63,8 +63,8 @@
   %for col in row[:-1]:
     <td>{{col}}</td>
   %end
-  <td><a href="edit/{{row[0]}}">edit</a></td>
-  <td><a href="show/{{row[0]}}">show</a></td>
+  <td><a href="/edit/{{row[0]}}">edit</a></td>
+  <td><a href="/show/{{row[0]}}">show</a></td>
   </tr>
 %end
 </table>

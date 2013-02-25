@@ -80,7 +80,10 @@ def new():
 
 @route('/new', method='POST')
 def new_post():
-    publish = request.POST.get('publish','').strip()
+    if request.POST.get('publish','').strip():
+        publish = True
+    else:
+        publish = False
     if request.POST.get('save','').strip() or publish:
         title = request.POST.get('title', '').strip()
         data = request.POST.get('data', '').strip()

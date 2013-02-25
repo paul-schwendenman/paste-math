@@ -9,7 +9,7 @@
   %for col in row:
     <td>{{col}}</td>
   %end
-  <td><a href="show/{{row[0]}}">show</a></td>
+  <td><a href="/show/{{row[0]}}">show</a></td>
   </tr>
 %end
 </table>
