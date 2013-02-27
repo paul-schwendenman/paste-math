@@ -7,18 +7,7 @@ import os
 import hashlib
 import sys
 
-
-class TableRow():
-    def __init__(self):
-        self._platform = ''
-        self._version = ''
-        self._package = ''
-        self._size = ''
-        self._sha1 = ''
-        self.lst = []
-
-    def add(self, data):
-        self.lst.append(data)
+VERSION_FILE = '.gaeversion'
 
 
 class MyHTMLParser(HTMLParser.HTMLParser):
@@ -95,7 +84,7 @@ class MyHTMLParser(HTMLParser.HTMLParser):
 def reporthook(blks, blksize, total):
     '''
     This function is called each time a chunk downloads
-    
+
     Print the progress so far
     '''
     totalblks = (total / blksize)
@@ -117,70 +106,64 @@ if __name__ == '__main__':
         manpage()
         exit(1)
 
-    print "Changing dir to '%s':" % args[0],
+    print "Changing dir to '%s'" % args[0],
     try:
         os.chdir(args[0])
     except OSError:
         print "FAILED"
-        manpage()
         exit(1)
     else:
         print
-
-    version = "unknown"
-    print "Checking local version:",
-    try:
-        with open('version', 'r') as f:
-            version = f.read()
-    except IOError:
-        pass
-
-    print version
 
     print "Fetching webpage"
     response = urllib2.urlopen(
                'https://developers.google.com/appengine/downloads')
     html = response.read()
+
     print "Parsing page"
     parser = MyHTMLParser()
     parser.feed(html)
-
     for item in parser.lst:
         if item['platform'] == 'Linux/Other Platforms':
             output = item
 
-    outdated = False
+    version = "unknown"
+    print "Checking local version:",
+    try:
+        with open(VERSION_FILE, 'r') as f:
+            version = f.read()
+    except IOError:
+        pass
+    print version
+
     if version == output['version']:
         print "GAE is current version"
+        exit(0)
     else:
-        outdated = True
         print "GAE is not latest version"
 
-    success = False
-    if outdated:
-        print "Fetching latest archive"
-        filename, headers = urllib.urlretrieve(output['href'],
-                                               reporthook=reporthook)
-        print
-        print "Checking sha1sum"
-        with open(filename, 'r') as f:
-            h = hashlib.sha1()
-            h.update(f.read())
-            filehash = h.hexdigest().lower()
-        if output['sha1 checksum'] == filehash:
-            print "Sha1 matches"
-            success = True
-        else:
-            print "Sha1 failed"
-            print output['sha1 checksum']
-            print filehash
+    print "Fetching latest archive (%s)" % output['size']
+    filename, headers = urllib.urlretrieve(output['href'],
+                                           reporthook=reporthook)
+    print
+    print "Checking sha1sum of %s" % filename
+    with open(filename, 'r') as f:
+        h = hashlib.sha1()
+        h.update(f.read())
+        filehash = h.hexdigest().lower()
+    if output['sha1 checksum'] == filehash:
+        print "Sha1 matches"
+    else:
+        print "Sha1 failed"
+        print output['sha1 checksum']
+        print filehash
+        exit(2)
 
-    if success:
-        print "Updating version number"
-        with open('version', 'w') as f:
-            f.write(output['version'])
-        print filename
-        print "Unzipping"
+    print "Updating version number"
+    with open(VERSION_FILE, 'w') as f:
+        f.write(output['version'])
 
-        os.system("unzip %s | less" % filename)
-        print "Finished"
+    print "Unzipping %s" % filename
+    os.system("unzip %s | less" % filename)
+
+    print "Finished"
