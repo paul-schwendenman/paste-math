@@ -1,0 +1,186 @@
+#!/usr/bin/python2.7
+
+import urllib2
+import urllib
+import HTMLParser
+import os
+import hashlib
+import sys
+
+
+class TableRow():
+    def __init__(self):
+        self._platform = ''
+        self._version = ''
+        self._package = ''
+        self._size = ''
+        self._sha1 = ''
+        self.lst = []
+
+    def add(self, data):
+        self.lst.append(data)
+
+
+class MyHTMLParser(HTMLParser.HTMLParser):
+    def __init__(self):
+        self.current = None
+        self.record = False
+        self.lst = []
+        self.stage = False
+        self.key = False
+        self.keys = []
+        self.href = None
+
+        HTMLParser.HTMLParser.__init__(self)
+
+    def handle_starttag(self, tag, attrs):
+        '''
+        Do the prep work for handling tags
+        '''
+        if tag == 'table':
+            if self.stage:
+                pass
+        elif tag == 'th':
+            if self.stage:
+                self.key = True
+        elif tag == 'tr':
+            if self.stage:
+                self.current = {}
+        elif tag == 'td':
+            if self.stage:
+                self.record = True
+        elif tag == 'h3':
+            if dict(attrs)['id'] == 'Google_App_Engine_SDK_for_Python':
+                self.stage = True
+        elif tag == 'a':
+            if self.record:
+                self.href = dict(attrs)['href']
+
+    def handle_endtag(self, tag):
+        '''
+        Save the information from useful tags
+        '''
+        if tag == 'table':
+            if self.stage:
+                #print "Encountered the end tag:", tag
+                self.stage = False
+        elif tag == 'th':
+            if self.stage:
+                self.key = False
+        elif tag == 'tr':
+            if self.stage:
+                self.current['href'] = self.href
+                self.href = None
+                self.lst.append(self.current)
+            self.current = None
+        elif tag == 'td':
+            self.record = False
+
+    def handle_data(self, data):
+        '''
+        Record information as needed
+        '''
+        if self.record:
+            try:
+                self.current[self.keys[len(self.current)]] = data
+            except IndexError as e:
+                print self.current
+                print self.keys
+                raise e
+        elif self.key:
+            self.keys.append(data.lower())
+            self.current[self.keys[len(self.current)]] = data
+
+
+def reporthook(blks, blksize, total):
+    '''
+    This function is called each time a chunk downloads
+    
+    Print the progress so far
+    '''
+    totalblks = (total / blksize)
+
+    print "\r%8i of %8i" % (blks * blksize, total),
+    sys.stdout.flush()
+
+
+def manpage():
+    print "usage: update-gae directory"
+    print "\t-h, --help"
+    print
+    print "Examples:"
+    print "\tupdate-gae /path/to/something"
+
+if __name__ == '__main__':
+    args = sys.argv[1:]
+    if len(args) != 1 or args[0] == '-h' or args[0] == '--help':
+        manpage()
+        exit(1)
+
+    print "Changing dir to '%s':" % args[0],
+    try:
+        os.chdir(args[0])
+    except OSError:
+        print "FAILED"
+        manpage()
+        exit(1)
+    else:
+        print
+
+    version = "unknown"
+    print "Checking local version:",
+    try:
+        with open('version', 'r') as f:
+            version = f.read()
+    except IOError:
+        pass
+
+    print version
+
+    print "Fetching webpage"
+    response = urllib2.urlopen(
+               'https://developers.google.com/appengine/downloads')
+    html = response.read()
+    print "Parsing page"
+    parser = MyHTMLParser()
+    parser.feed(html)
+
+    for item in parser.lst:
+        if item['platform'] == 'Linux/Other Platforms':
+            output = item
+
+    outdated = False
+    if version == output['version']:
+        print "GAE is current version"
+    else:
+        outdated = True
+        print "GAE is not latest version"
+
+    success = False
+    if outdated:
+        print "Fetching latest archive"
+        filename, headers = urllib.urlretrieve(output['href'],
+                                               reporthook=reporthook)
+        print
+        print "Checking sha1sum"
+        with open(filename, 'r') as f:
+            h = hashlib.sha1()
+            h.update(f.read())
+            filehash = h.hexdigest().lower()
+        if output['sha1 checksum'] == filehash:
+            print "Sha1 matches"
+            success = True
+        else:
+            print "Sha1 failed"
+            print output['sha1 checksum']
+            print filehash
+
+    if success:
+        print "Updating version number"
+        with open('version', 'w') as f:
+            f.write(output['version'])
+        print filename
+        print "Unzipping"
+
+        os.system("unzip %s | less" % filename)
+        print "Finished"
