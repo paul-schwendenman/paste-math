@@ -8,6 +8,8 @@ HTML.  It is meant to allow users to post pages.  The pages will then be
 able to be edited and viewed.  Additionally, there will be an admin
 interface. 
 
+
+
 Install GAE
 -----------
 
@@ -16,8 +18,13 @@ google app engine api.
 
 Download and unzip::
 
-    cd ~
-    mkdir google_projects
+    mkdir ~/google_projects
+    update-gae !$
+
+
+Or you could use the following after checking for the newest version, but
+make sure you check the sha1sum::
+
     cd google_projects
     wget -O gae.zip http://googleappengine.googlecode.com/files/google_appengine_1.7.4.zip
     unzip gae.zip
@@ -47,20 +54,21 @@ Upload the app
 Update the GAE SDK
 -------------------
 
-Check the version from https://developers.google.com/appengine/downloads. Then update using::
+Use the script to update the sdk::
+
+	update-gae ~/google_projects
+
+
+Or check the version from https://developers.google.com/appengine/downloads. Then update using::
 
 	cd ~/google_projects
 	rm -r google_appengine
 	wget -O gae.zip http://googleappengine.googlecode.com/files/google_appengine_1.X.X.zip
-	unzip gae.zip
+	sha1sum gae.zip
+	unzip !$
 	rm !$
 
-Checking the checksum
-----------------------
 
-From https://developers.google.com/appengine/downloads google provides a sha1sum. Match it using::
-
-	sha1sum gae.zip
 
 
 Logs
