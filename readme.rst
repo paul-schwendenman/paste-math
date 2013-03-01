@@ -68,12 +68,9 @@ Or check the version from https://developers.google.com/appengine/downloads. The
 	unzip !$
 	rm !$
 
-
-
-
 Logs
 ----
 
 GAE will also allow the download of log files::
 
-	python ~/google_projects/google_appengine/appcfg.py request_logs -n 0 -e u@d.c -a ~/paste-math/ ~/paste-math/log.txt
+	python ~/google_projects/google_appengine/appcfg.py request_logs -n 0 -a ~/paste-math/ ~/paste-math/log.txt
